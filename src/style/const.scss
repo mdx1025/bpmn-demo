@@ -1,0 +1,79 @@
+//主题
+$danger: #f56c6c;
+$success: #49cd45;
+/* 标准色 */
+$red: #fd2671;
+$orange: #fa9b25;
+$yellow: #fbbd08;
+$yellow-light: #fed904;
+$olive: #8dc63f;
+$green: #39b54a;
+$cyan: #00bcd4;
+$blue: #0081ff;
+$blue-bgc:rgba(19,21,32,0.3);
+$blue-light: #7399fe;
+$blue-dark: #0a3f6f;
+$blue-opacity:rgba(35,70,107,.3);
+$steel:#474f5f;
+$steel-opacity: rgba(70,80,95,.9);
+$purple: #6739b6;
+$mauve: #9c26b0;
+$pink: #e03997;
+$brown: #a5673f;
+$grey: #8799a3;
+$black: #333333;
+$darkGray: #666666;
+$gray: #aaaaaa;
+$ghostWhite: #f2f2f2;
+$white: #ffffff;
+/* 浅色 */
+$redLight: #fadbd9;
+$orangeLight: #fde6d2;
+$yellowLight: #fef2ce;
+$oliveLight: #e8f4d9;
+$greenLight: #d7f0db;
+$cyanLight: #d2f1f0;
+$blueLight: #cce6ff;
+$purpleLight: #e1d7f0;
+$mauveLight: #ebd4ef;
+$pinkLight: #f9d7ea;
+$brownLight: #ede1d9;
+$greyLight: #e7ebed;
+/* 渐变色 */
+$gradualRed: linear-gradient(45deg, #f43f3b, #ec008c);
+$gradualOrange: linear-gradient(45deg, #ff9700, #ed1c24);
+$gradualGreen: linear-gradient(45deg, #39b54a, #8dc63f);
+$gradualPurple: linear-gradient(45deg, #9000ff, #5e00ff);
+$gradualPurpleLight: linear-gradient(45deg, #6d5ed3, #c673db);
+$gradualPink: linear-gradient(45deg, #ec008c, #6739b6);
+$gradualBlue: linear-gradient(45deg, #0081ff, #1cbbb4);
+$gradualBlack: linear-gradient(45deg, #303030, #666);
+
+$gradualRed-circle: radial-gradient( #f43f3b, #ec008c);
+$gradualOrange-circle: radial-gradient( #ff9700, #ed1c24);
+$gradualGreen-circle: radial-gradient( #39b54a, #8dc63f);
+$gradualPurple-circle: radial-gradient( #9000ff, #5e00ff);
+$gradualPurpleLight-circle: radial-gradient( #c673db,#6d5ed3 );
+$gradualPink-circle: radial-gradient( #ec008c, #6739b6);
+$gradualBlue-circle: radial-gradient( #1cbbb4,#0081ff);
+$gradualBlack-circle: radial-gradient( #303030, #666);
+/* 阴影透明色 */
+$redShadow: rgba(204, 69, 59, 0.2);
+$orangeShadow: rgba(217, 109, 26, 0.2);
+$yellowShadow: rgba(224, 170, 7, 0.2);
+$oliveShadow: rgba(124, 173, 55, 0.2);
+$greenShadow: rgba(48, 156, 63, 0.2);
+$cyanShadow: rgba(28, 187, 180, 0.2);
+$blueShadow: rgba(0, 102, 204, 0.2);
+$purpleShadow: rgba(88, 48, 156, 0.2);
+$mauveShadow: rgba(133, 33, 150, 0.2);
+$pinkShadow: rgba(199, 50, 134, 0.2);
+$brownShadow: rgba(140, 88, 53, 0.2);
+$greyShadow: rgba(114, 130, 138, 0.2);
+$grayShadow: rgba(114, 130, 138, 0.2);
+$blackShadow: rgba(26, 26, 26, 0.2);
+// 定义字体颜色规范
+$color-txt-title: #666;
+$color-txt-sub: #999;
+$color-txt: #333;
+
