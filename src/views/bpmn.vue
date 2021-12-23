@@ -2,24 +2,28 @@
   <div class="bpmn-con">
   <!-- 把操作按钮写在这里面 -->
     <div class="action">
-      <el-upload action class="upload-demo" :before-upload="openBpmn">
-        <el-button icon="el-icon-folder-opened" type="primary" size="mini"></el-button>
-      </el-upload>
-      <el-button class="new" icon="el-icon-circle-plus" @click="newDiagram" type="primary" size="mini"></el-button>
-      <!-- <el-button icon="el-icon-download" @click="downloadBpmn"></el-button>
-      <el-button icon="el-icon-picture" @click="downloadSvg"></el-button>
-      <a hidden ref="downloadLink"></a> -->
-      <el-tooltip effect="light">
+      <el-button-group key="file-control">
+        <el-button size="mini" type="primary" icon="el-icon-folder-opened" @click="$refs.refFile.click()">打开文件</el-button>
+        <input type="file" id="files" ref="refFile" style="display: none" accept=".xml, .bpmn" @change="importLocalFile" />
+        <el-tooltip effect="light">
           <div slot="content">
-            <el-button type="text" @click="downloadProcessAsXml()">下载为XML文件</el-button>
+            <el-button size="mini" type="text" @click="downloadProcessAsXml()">下载为XML文件</el-button>
             <br />
-            <el-button type="text" @click="downloadProcessAsSvg()">下载为SVG文件</el-button>
+            <el-button size="mini" type="text" @click="downloadProcessAsSvg()">下载为SVG文件</el-button>
             <br />
-            <el-button type="text" @click="downloadProcessAsBpmn()">下载为BPMN文件</el-button>
+            <el-button size="mini" type="text" @click="downloadProcessAsBpmn()">下载为BPMN文件</el-button>
           </div>
-          <el-button type="primary" icon="el-icon-download" size="mini">下载文件</el-button>
+          <el-button size="mini" type="primary" icon="el-icon-download">下载文件</el-button>
         </el-tooltip>
-      
+        <el-tooltip effect="light">
+          <div slot="content">
+            <el-button size="mini" type="text" @click="previewProcessXML">预览XML</el-button>
+            <br />
+            <el-button size="mini" type="text" @click="previewProcessJson">预览JSON</el-button>
+          </div>
+          <el-button size="mini" type="primary" icon="el-icon-view">预览</el-button>
+        </el-tooltip>
+      </el-button-group>
       <el-button-group key="align-control">
         <el-tooltip effect="light" content="向左对齐">
           <el-button size="mini" class="align align-left" icon="el-icon-s-data" @click="elementsAlign('left')" />
@@ -40,6 +44,29 @@
           <el-button size="mini" class="align align-middle" icon="el-icon-s-data" @click="elementsAlign('middle')" />
         </el-tooltip>
       </el-button-group>
+      <el-button-group key="scale-control">
+          <el-tooltip effect="light" content="缩小视图">
+            <el-button size="mini" :disabled="defaultZoom < 0.2" icon="el-icon-zoom-out" @click="processZoomOut()" />
+          </el-tooltip>
+          <el-button size="mini">{{ Math.floor(this.defaultZoom * 10 * 10) + "%" }}</el-button>
+          <el-tooltip effect="light" content="放大视图">
+            <el-button size="mini" :disabled="defaultZoom > 4" icon="el-icon-zoom-in" @click="processZoomIn()" />
+          </el-tooltip>
+          <el-tooltip effect="light" content="重置视图并居中">
+            <el-button size="mini" icon="el-icon-c-scale-to-original" @click="processReZoom()" />
+          </el-tooltip>
+        </el-button-group>
+        <el-button-group key="stack-control">
+          <el-tooltip effect="light" content="撤销">
+            <el-button size="mini" :disabled="!revocable" icon="el-icon-refresh-left" @click="processUndo()" />
+          </el-tooltip>
+          <el-tooltip effect="light" content="恢复">
+            <el-button size="mini" :disabled="!recoverable" icon="el-icon-refresh-right" @click="processRedo()" />
+          </el-tooltip>
+          <el-tooltip effect="light" content="重新绘制">
+            <el-button size="mini" icon="el-icon-refresh" @click="processRestart" />
+          </el-tooltip>
+        </el-button-group>
     </div>
     <div class="container">
       <!-- 创建一个canvas画布 npmn-js是通过canvas实现绘图的，并设置ref让vue获取到element -->
@@ -48,9 +75,10 @@
         <!-- 工具栏显示的地方 -->
         <div class="bpmn-js-properties-panel" id="js-properties-panel"></div>
       </div>
-
-      
     </div>
+    <el-dialog title="预览" width="60%" :visible.sync="previewModelVisible" append-to-body destroy-on-close>
+      <highlightjs :language="previewType" :code="previewResult" />
+    </el-dialog>
   </div>
 </template>
 
@@ -60,51 +88,28 @@ import BpmnModeler from "bpmn-js/lib/Modeler";
 import propertiesProviderModule from "bpmn-js-properties-panel/lib/provider/camunda";
 import propertiesPanelModule from "bpmn-js-properties-panel";
 // import camundaModdleDescriptor from "camunda-bpmn-moddle/resources/camunda";
-
+// import flowableModdleDescriptor from "../components/bpmn/descriptor/flowableDescriptor.json";
 // 汉化
 import customTranslate from "../components/bpmn/translate/customTranslate";
+//自定义左侧工具栏
 import customPaletteModule from '../components/bpmn/palette/index'
+//默认模板
+import DefaultEmptyXML from "../components/bpmn/defaultEmpty";
+// 引入json转换与高亮
+import convert from "xml-js";
 
 export default {
   data() {
     return {
       bpmnModeler: null,
       canvas: null,
-      bpmnTemplate: `
-          <?xml version="1.0" encoding="UTF-8"?>
-          <definitions 
-              xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" 
-              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
-              xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" 
-              xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" 
-              xmlns:camunda="http://camunda.org/schema/1.0/bpmn" 
-              xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
-              xmlns:activiti="http://activiti.org/bpmn" 
-              id="m1577635100724" 
-              name="" 
-              targetNamespace="http://www.activiti.org/testm1577635100724"
-            >
-            <process id="process" processType="None" isClosed="false" isExecutable="true">
-              <extensionElements>
-                <camunda:properties>
-                  <camunda:property name="a" value="1" />
-                </camunda:properties>
-              </extensionElements>
-              <startEvent id="_2" name="start" />
-            </process>
-            <bpmndi:BPMNDiagram id="BPMNDiagram_leave">
-              <bpmndi:BPMNPlane id="BPMNPlane_leave" bpmnElement="leave">
-                <bpmndi:BPMNShape id="BPMNShape__2" bpmnElement="_2">
-                  <omgdc:Bounds x="144" y="368" width="32" height="32" />
-                  <bpmndi:BPMNLabel>
-                    <omgdc:Bounds x="149" y="400" width="23" height="14" />
-                  </bpmndi:BPMNLabel>
-                </bpmndi:BPMNShape>
-              </bpmndi:BPMNPlane>
-            </bpmndi:BPMNDiagram>
-          </definitions>
-      `,
-      events:["element.click"]
+      bpmnTemplate: "",
+      previewModelVisible: false,
+      previewResult: "",
+      previewType: "xml",
+      defaultZoom:1,
+      recoverable: false,
+      revocable: false
     };
   },
   mounted() {
@@ -139,19 +144,27 @@ export default {
           customPaletteModule
         ],
         moddleExtensions: {
-        //   camunda: camundaModdleDescriptor
+          // camunda: camundaModdleDescriptor,
+          // flowable : flowableModdleDescriptor
         }
       });
       this.initModelListeners()
+      let newId = `Process_${new Date().getTime()}`;
+      let newName = `业务流程_${new Date().getTime()}`;
+      this.bpmnTemplate=DefaultEmptyXML(newId,newName,'flowable')
       await this.createNewDiagram(this.bpmnTemplate);
     },
     async createNewDiagram(bpmn) {
       // 将字符串转换成图显示出来;
-      this.bpmnModeler.importXML(bpmn, err => {
-        if (err) {
-          console.error("打开模型出错,请确认该模型符合Bpmn2.0规范");
-        }
-      });
+      try {
+        const result = await this.bpmnModeler.importXML(bpmn);
+        const { warnings } = result;
+        console.log(warnings);
+      } catch (err) {
+        console.log(err.message, err.warnings);
+        console.error("打开模型出错,请确认该模型符合Bpmn2.0规范");
+
+      }
     },
     initModelListeners() {
       const EventBus = this.bpmnModeler.get("eventBus");
@@ -185,54 +198,17 @@ export default {
         this.defaultZoom = Math.floor(scale * 100) / 100;
       });
     },
-    newDiagram() {
-      this.createNewDiagram(this.bpmnTemplate);
-    },
-
-    downloadBpmn() {
-      this.bpmnModeler.saveXML({ format: true }, (err, xml) => {
-        if (!err) {
-          // 获取文件名
-          const name = `${this.getFilename(xml)}.bpmn`;
-          // 将文件名以及数据交给下载方法
-          this.download({ name: name, data: xml });
-        }
-      });
-    },
-    downloadSvg() {
-      this.bpmnModeler.saveXML({ format: true }, (err, xml) => {
-        if (!err) {
-          // 获取文件名
-          const name = `${this.getFilename(xml)}.svg`;
-
-          // 从建模器画布中提取svg图形标签
-          let context = "";
-          const djsGroupAll = this.$refs.canvas.querySelectorAll(".djs-group");
-          for (let item of djsGroupAll) {
-            context += item.innerHTML;
-          }
-          // 获取svg的基本数据，长宽高
-          const viewport = this.$refs.canvas
-            .querySelector(".viewport")
-            .getBBox();
-
-          // 将标签和数据拼接成一个完整正常的svg图形
-          const svg = `
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              xmlns:xlink="http://www.w3.org/1999/xlink"
-              width="${viewport.width}"
-              height="${viewport.height}"
-              viewBox="${viewport.x} ${viewport.y} ${viewport.width} ${viewport.height}"
-              version="1.1"
-              >
-              ${context}
-            </svg>
-          `;
-          // 将文件名以及数据交给下载方法
-          this.download({ name: name, data: svg });
-        }
-      });
+    
+    // 加载本地文件
+    importLocalFile() {
+      const that = this;
+      const file = this.$refs.refFile.files[0];
+      const reader = new FileReader();
+      reader.readAsText(file);
+      reader.onload = function() {
+        let xmlStr = this.result;
+        that.createNewDiagram(xmlStr);
+      };
     },
     downloadProcessAsXml() {
       this.downloadProcess("xml");
@@ -299,7 +275,20 @@ export default {
       };
       return false;
     },
-
+    previewProcessXML() {
+      this.bpmnModeler.saveXML({ format: true }).then(({ xml }) => {
+        this.previewResult = xml;
+        this.previewType = "xml";
+        this.previewModelVisible = true;
+      });
+    },
+    previewProcessJson() {
+      this.bpmnModeler.saveXML({ format: true }).then(({ xml }) => {
+        this.previewResult = convert.xml2json(xml, { spaces: 2 });
+        this.previewType = "json";
+        this.previewModelVisible = true;
+      });
+    },
     getFilename(xml) {
       let start = xml.indexOf("process");
       let filename = xml.substr(start, xml.indexOf(">"));
@@ -339,13 +328,84 @@ export default {
         type: "warning"
       }).then(() => Align.trigger(SelectedElements, align));
     },
-    
+    processRedo() {
+      this.bpmnModeler.get("commandStack").redo();
+    },
+    processUndo() {
+      this.bpmnModeler.get("commandStack").undo();
+    },
+    processZoomIn(zoomStep = 0.1) {
+      let newZoom = Math.floor(this.defaultZoom * 100 + zoomStep * 100) / 100;
+      if (newZoom > 4) {
+        throw new Error("[Process Designer Warn ]: The zoom ratio cannot be greater than 4");
+      }
+      this.defaultZoom = newZoom;
+      this.bpmnModeler.get("canvas").zoom(this.defaultZoom);
+    },
+    processZoomOut(zoomStep = 0.1) {
+      let newZoom = Math.floor(this.defaultZoom * 100 - zoomStep * 100) / 100;
+      if (newZoom < 0.2) {
+        throw new Error("[Process Designer Warn ]: The zoom ratio cannot be less than 0.2");
+      }
+      this.defaultZoom = newZoom;
+      this.bpmnModeler.get("canvas").zoom(this.defaultZoom);
+    },
+    processReZoom() {
+      this.defaultZoom = 1;
+      this.bpmnModeler.get("canvas").zoom("fit-viewport", "auto");
+    },
+    processRestart() {
+      this.recoverable = false;
+      this.revocable = false;
+      let newId = `Process_${new Date().getTime()}`;
+      let newName = `业务流程_${new Date().getTime()}`;
+      this.bpmnTemplate=DefaultEmptyXML(newId,newName,'flowable')
+      this.createNewDiagram(this.bpmnTemplate);
+    },
   },
  
 };
 </script>
-
-<style scoped>
+<style lang="scss">
+.el-button-group {
+      margin: 4px;
+    }
+.align {
+      position: relative;
+      i {
+        &:after {
+          content: "|";
+          position: absolute;
+          transform: rotate(90deg) translate(200%, 60%);
+        }
+      }
+    }
+.align.align-left i {
+      transform: rotate(90deg);
+    }
+    .align.align-right i {
+      transform: rotate(-90deg);
+    }
+    .align.align-top i {
+      transform: rotate(180deg);
+    }
+    .align.align-bottom i {
+      transform: rotate(0deg);
+    }
+    .align.align-center i {
+      transform: rotate(90deg);
+      &:after {
+        transform: rotate(90deg) translate(0, 60%);
+      }
+    }
+    .align.align-middle i {
+      transform: rotate(0deg);
+      &:after {
+        transform: rotate(90deg) translate(0, 60%);
+      }
+    } 
+</style>
+<style scoped lang="scss">
 .bpmn-con{
 
 }
@@ -372,30 +432,7 @@ export default {
   min-height: 40px;
   
 }
-/* // .align.align-left i {
-  //     transform: rotate(90deg);
-  //   }
-  //   .align.align-right i {
-  //     transform: rotate(-90deg);
-  //   }
-  //   .align.align-top i {
-  //     transform: rotate(180deg);
-  //   }
-  //   .align.align-bottom i {
-  //     transform: rotate(0deg);
-  //   }
-  //   .align.align-center i {
-  //     transform: rotate(90deg);
-  //     &:after {
-  //       transform: rotate(90deg) translate(0, 60%);
-  //     }
-  //   }
-  //   .align.align-middle i {
-  //     transform: rotate(0deg);
-  //     &:after {
-  //       transform: rotate(90deg) translate(0, 60%);
-  //     }
-  //   } */
+
 .upload-demo {
   margin-right: 10px;
 }

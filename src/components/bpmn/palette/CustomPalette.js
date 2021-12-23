@@ -30,7 +30,7 @@ export default class CustomPalette {
         }
         function createStart() {
             return function(event) {
-                const businessObject = bpmnFactory.create('bpmn:Task'); // 其实这个也可以不要
+                const businessObject = bpmnFactory.create('bpmn:StartEvent'); // 其实这个也可以不要
                 const shape = elementFactory.createShape({
                     type: 'bpmn:StartEvent',
                     businessObject
@@ -39,7 +39,18 @@ export default class CustomPalette {
                 create.start(event, shape);
             }
         }
-
+        function createListener(type){
+            return function(event) {
+                const businessObject = bpmnFactory.create("bpmn:UserTask"); // 其实这个也可以不要
+                const shape = elementFactory.createShape({
+                    type: "bpmn:UserTask",
+                    businessObject
+                });
+                console.log(shape) // 只在拖动或者点击时触发
+                create.start(event, shape);
+            }
+        }
+        
         return {
             'create.lindaidai-task': {
                 group: 'model',
@@ -57,6 +68,15 @@ export default class CustomPalette {
                 action: {
                     dragstart: createStart(),
                     click: createStart()
+                }
+            },
+            "create.user-task":{
+                group: "activity",
+                className: "bpmn-icon-user-task",
+                title: translate("Create User Task"),
+                action: {
+                    dragstart: createListener(),
+                    click: createListener()
                 }
             }
         }

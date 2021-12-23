@@ -16,6 +16,10 @@ import 'element-ui/lib/theme-chalk/index.css';
 import './style/custom/index.css'
 Vue.use(ElementUI);
 
+import { vuePlugin } from "@/highlight";
+import "highlight.js/styles/atom-one-dark-reasonable.css";
+Vue.use(vuePlugin);
+
 Vue.config.productionTip = false
 
 new Vue({
