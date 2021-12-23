@@ -24,7 +24,7 @@
             "type": "String"
           },
           {
-            "name": "select",
+            "name": "passSelect",
             "isAttr": true,
             "type": "Array"
           }

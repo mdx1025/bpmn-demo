@@ -202,6 +202,7 @@ export default {
           name: '我是新名字',
           customName:'这是自定义属性' //自定义属性会出现在$attrs
         })
+        
       });
       // 监听视图缩放变化
       this.bpmnModeler.on("canvas.viewbox.changed", ({ viewbox }) => {

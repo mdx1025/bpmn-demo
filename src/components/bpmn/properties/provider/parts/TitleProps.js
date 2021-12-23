@@ -1,7 +1,8 @@
 // /parts/TitleProps.js
 import entryFactory from 'bpmn-js-properties-panel/lib/factory/EntryFactory';
+import cmdHelper from 'bpmn-js-properties-panel/lib/helper/CmdHelper';
 
-import { is } from 'bpmn-js/lib/util/ModelUtil';
+import { is,getBusinessObject } from 'bpmn-js/lib/util/ModelUtil';
 
 export default function(group, element,translate) {
   if (is(element, 'bpmn:StartEvent')) { // 可以在这里做类型判断 如果不判断就是都展示
@@ -13,6 +14,26 @@ export default function(group, element,translate) {
     group.entries.push(entryFactory.textField(translate,option2));
 
     // group.entries.push(entryFactory.selectBox(translate,option1));
+    group.entries.push(entryFactory.selectBox(translate, {
+        id: 'form-key',
+        label: '审批人',
+        modelProperty: 'passSelect',
+        // selectOptions: [
+        //   { value: "one", name: "one" }, { value: "two", name: "two" }
+        // ],
+        selectOptions:[{value:1,name:'madx'},{value:2,name:'others'}],
+        emptyParameter: false,
+        get (element, node) {
+          let bo = getBusinessObject(element);
+          return {
+            passSelect: bo.get('passSelect') ? bo.get('passSelect') : null,
+          };
+        },
+        set (element, values, node) {
+          console.log(element)
+          return cmdHelper.updateBusinessObject(element, element.businessObject, {'passSelect' : values.passSelect || ''});
+        },
+      }));
 
     //下面写法有错误是因为textField方法需要传两个参数 但是下面只传了一个参数
     // group.entries.push(entryFactory.textField({
