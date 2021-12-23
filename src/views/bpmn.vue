@@ -89,6 +89,8 @@ import propertiesProviderModule from "bpmn-js-properties-panel/lib/provider/camu
 import propertiesPanelModule from "bpmn-js-properties-panel";
 // import camundaModdleDescriptor from "camunda-bpmn-moddle/resources/camunda";
 // import flowableModdleDescriptor from "../components/bpmn/descriptor/flowableDescriptor.json";
+import propertiesProviderAuthorityModule from "../components/bpmn/properties/provider/index";
+import authorityModdleDescriptor  from '../components/bpmn/properties/provider/authority.json'
 // 汉化
 import customTranslate from "../components/bpmn/translate/customTranslate";
 //自定义左侧工具栏
@@ -139,8 +141,9 @@ export default {
         },
         additionalModules: [
           // 工具栏模块
-          propertiesProviderModule,
+          // propertiesProviderModule,
           propertiesPanelModule,
+          propertiesProviderAuthorityModule, //自定义右侧属性栏
           // 汉化模块
           customTranslateModule,
           //用户自定义左侧图形栏
@@ -150,6 +153,7 @@ export default {
         moddleExtensions: {
           // camunda: camundaModdleDescriptor,
           // flowable : flowableModdleDescriptor
+          authority:authorityModdleDescriptor 
         }
       });
       this.initModelListeners()
@@ -194,6 +198,10 @@ export default {
           stroke: 'green',
           fill: 'yellow'
         });
+        modeling.updateProperties(elementToColor, {
+          name: '我是新名字',
+          customName:'这是自定义属性' //自定义属性会出现在$attrs
+        })
       });
       // 监听视图缩放变化
       this.bpmnModeler.on("canvas.viewbox.changed", ({ viewbox }) => {
