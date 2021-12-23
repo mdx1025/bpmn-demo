@@ -94,7 +94,7 @@ import customTranslate from "../components/bpmn/translate/customTranslate";
 //自定义左侧工具栏
 import customPaletteModule from '../components/bpmn/palette/index'
 //自定义渲染
-import customRendererModule from '../components/bpmn/renderer/index'
+import customRendererModule from '../components/bpmn/palette/index'
 
 //默认模板
 import DefaultEmptyXML from "../components/bpmn/defaultEmpty";
