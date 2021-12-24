@@ -105,6 +105,8 @@ import DefaultEmptyXML from "../components/bpmn/defaultEmpty";
 // 引入json转换与高亮
 import convert from "xml-js";
 
+import ReplaceMenuProvider from "bpmn-js/lib/features/popup-menu/ReplaceMenuProvider.js";
+
 export default {
   data() {
     return {
@@ -207,7 +209,7 @@ export default {
         //   name: '我是新名字',
         //   customName:'这是自定义属性' //自定义属性会出现在$attrs
         // })
-        
+        console.log(ReplaceMenuProvider,33333)
       });
       // 监听视图缩放变化
       this.bpmnModeler.on("canvas.viewbox.changed", ({ viewbox }) => {
