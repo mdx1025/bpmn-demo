@@ -95,6 +95,8 @@ import authorityModdleDescriptor  from '../components/bpmn/properties/provider/a
 import customTranslate from "../components/bpmn/translate/customTranslate";
 //自定义左侧工具栏
 import customPaletteModule from '../components/bpmn/palette/index'
+//自定义contextPad
+import customContextPadModule from '../components/bpmn/contextPad/index'
 //自定义渲染
 import customRendererModule from '../components/bpmn/palette/index'
 
@@ -148,7 +150,10 @@ export default {
           customTranslateModule,
           //用户自定义左侧图形栏
           customPaletteModule,
-          customRendererModule
+          //自定义渲染
+          customRendererModule,
+          //自定义contextPad
+          customContextPadModule
         ],
         moddleExtensions: {
           // camunda: camundaModdleDescriptor,
@@ -198,10 +203,10 @@ export default {
           stroke: 'green',
           fill: 'yellow'
         });
-        modeling.updateProperties(elementToColor, {
-          name: '我是新名字',
-          customName:'这是自定义属性' //自定义属性会出现在$attrs
-        })
+        // modeling.updateProperties(elementToColor, {
+        //   name: '我是新名字',
+        //   customName:'这是自定义属性' //自定义属性会出现在$attrs
+        // })
         
       });
       // 监听视图缩放变化

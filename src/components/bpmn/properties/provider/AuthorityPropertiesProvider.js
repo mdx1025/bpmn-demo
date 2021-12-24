@@ -42,7 +42,7 @@ function createGeneralTabGroups(element, bpmnFactory, canvas, elementRegistry, t
     return [
         generalGroup,
         detailsGroup,
-        documentationGroup
+        // documentationGroup
     ];
 }
 
