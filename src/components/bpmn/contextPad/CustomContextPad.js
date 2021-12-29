@@ -21,10 +21,9 @@ export default class CustomContextPad {
             translate,
             popupMenu
         } = this;
-        console.log(popupMenu,999999999999)
         function appendTask(event, element) {
             if (autoPlace) {
-                const shape = elementFactory.createShape({ type: 'bpmn:Task' });
+                const shape = elementFactory.createShape({ type: 'bpmn:Task1' });
                 autoPlace.append(element, shape);
             } else {
                 appendTaskStart(event, element);
@@ -32,7 +31,7 @@ export default class CustomContextPad {
         }
 
         function appendTaskStart(event) {
-            const shape = elementFactory.createShape({ type: 'bpmn:Task' });
+            const shape = elementFactory.createShape({ type: 'bpmn:Task1' });
             create.start(event, shape, element);
         }
         // if (!popupMenu.isEmpty(element, "bpmn-replace")) {

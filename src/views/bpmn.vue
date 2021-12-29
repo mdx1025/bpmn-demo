@@ -87,8 +87,8 @@ import BpmnModeler from "bpmn-js/lib/Modeler";
 // 工具栏相关
 import propertiesProviderModule from "bpmn-js-properties-panel/lib/provider/camunda";
 import propertiesPanelModule from "bpmn-js-properties-panel";
-// import camundaModdleDescriptor from "camunda-bpmn-moddle/resources/camunda";
-// import flowableModdleDescriptor from "../components/bpmn/descriptor/flowableDescriptor.json";
+import camundaModdleDescriptor from "camunda-bpmn-moddle/resources/camunda";
+// import flowableModdleDescriptor from "../components/bpmn/properties/descriptor/flowableDescriptor.json";
 import propertiesProviderAuthorityModule from "../components/bpmn/properties/provider/index";
 import authorityModdleDescriptor  from '../components/bpmn/properties/provider/authority.json'
 // 汉化
@@ -145,9 +145,9 @@ export default {
         },
         additionalModules: [
           // 工具栏模块
-          // propertiesProviderModule,
+          propertiesProviderModule,
           propertiesPanelModule,
-          propertiesProviderAuthorityModule, //自定义右侧属性栏
+          // propertiesProviderAuthorityModule, //自定义右侧属性栏
           // 汉化模块
           customTranslateModule,
           //用户自定义左侧图形栏
@@ -158,8 +158,8 @@ export default {
           customContextPadModule
         ],
         moddleExtensions: {
-          // camunda: camundaModdleDescriptor,
-          // flowable : flowableModdleDescriptor
+          camunda: camundaModdleDescriptor,
+          // flowable : flowableModdleDescriptor,
           authority:authorityModdleDescriptor 
         }
       });
@@ -183,6 +183,7 @@ export default {
     },
     initModelListeners() {
       const EventBus = this.bpmnModeler.get("eventBus");
+      console.log(this.bpmnModeler, "this.bpmnModeler");
       const that = this;
       // 监听图形改变返回xml
       EventBus.on("commandStack.changed", async event => {
@@ -209,7 +210,7 @@ export default {
         //   name: '我是新名字',
         //   customName:'这是自定义属性' //自定义属性会出现在$attrs
         // })
-        console.log(ReplaceMenuProvider,33333)
+        console.log(ReplaceMenuProvider.prototype._createEntries,33333)
       });
       // 监听视图缩放变化
       this.bpmnModeler.on("canvas.viewbox.changed", ({ viewbox }) => {

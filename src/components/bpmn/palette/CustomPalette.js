@@ -19,9 +19,9 @@ export default class CustomPalette {
 
         function createTask() {
             return function(event) {
-                const businessObject = bpmnFactory.create('bpmn:Task'); // 其实这个也可以不要
+                const businessObject = bpmnFactory.create('bpmn:Task1'); // 其实这个也可以不要
                 const shape = elementFactory.createShape({
-                    type: 'bpmn:Task',
+                    type: 'bpmn:Task1',
                     businessObject
                 });
                 console.log(shape) // 只在拖动或者点击时触发

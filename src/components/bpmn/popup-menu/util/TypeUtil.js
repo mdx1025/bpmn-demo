@@ -5,6 +5,11 @@
 // import {
 //   isExpanded
 // } from '../../../util/DiUtil';
+function is(element, type) {
+  var bo = getBusinessObject(element);
+
+  return bo && (typeof bo.$instanceOf === 'function') && bo.$instanceOf(type);
+}
 function isExpanded(element) {
 
   if (is(element, 'bpmn:CallActivity')) {
