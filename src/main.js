@@ -19,7 +19,9 @@ Vue.use(ElementUI);
 import { vuePlugin } from "@/highlight";
 import "highlight.js/styles/atom-one-dark-reasonable.css";
 Vue.use(vuePlugin);
-
+import MyPD from "./package/index.js";
+Vue.use(MyPD);
+import "./package/theme/index.scss";
 Vue.config.productionTip = false
 
 new Vue({

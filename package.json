@@ -19,6 +19,7 @@
     "xml-js": "^1.6.11"
   },
   "devDependencies": {
+    "bpmn-js-token-simulation": "^0.10.0",
     "@fortawesome/fontawesome-free": "^5.12.0",
     "@vue/cli-plugin-babel": "^4.1.0",
     "@vue/cli-plugin-eslint": "^4.1.0",

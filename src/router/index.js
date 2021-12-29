@@ -1,14 +1,14 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
-import bpmn from '../views/bpmn.vue'
+import bpmn1 from '../views/bpmn1.vue'
 
 Vue.use(VueRouter)
 
 const routes = [
   {
     path: '/',
-    name: 'bpmn',
-    component: bpmn
+    name: 'bpmn1',
+    component: bpmn1
   }
 ]
 
